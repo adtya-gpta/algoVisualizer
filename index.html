@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </head>
 
 <body>
@@ -26,14 +26,54 @@
                 <span>GitHub</span>
             </a>
 
-            <button class="hamburger-btn">
-                <span>|</span>
-                <span>|</span>
-                <span>|</span>
+            <button type="button" class="hamburger-btn">
+                <img src="img/hamburger.svg" alt="Open Sidebar">
             </button>
         </div>
     </header>
     <main>
+        <div class="sidebar">
+            <div class="sidebar-top">
+                <a href="index.html" class="nav-left">
+                    <span class="logo-icon">&lt;/&gt;</span>
+                    <span>AlgoLab</span>
+                </a>
+
+                <button type="button" class="close-btn">
+                    <img src="img/close.svg" alt="Close Sidebar">
+                </button>
+            </div>
+
+            <div class="sidebar-sorting">
+                <h3 class="sidebar-headings">SORTING ALGORITHMS</h3>
+                <ul>
+                    <li><a href=""><h4>Bubble Sort</h4></a></li>
+                    <li><a href=""><h4>Insertion Sort</h4></a></li>
+                    <li><a href=""><h4>Selection Sort</h4></a></li>
+                    <li><a href=""><h4>Merge Sort</h4></a></li>
+                    <li><a href=""><h4>Quick Sort</h4></a></li>
+                    <li><a href=""><h4>Shell Sort</h4></a></li>
+                    <li><a href=""><h4>Counting Sort</h4></a></li>
+                    <li><a href=""><h4>Radix Sort</h4></a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-sorting">
+                <h3 class="sidebar-headings">GRAPH ALGORITHMS</h3>
+                <ul>
+                    <li><a href=""><h4>Depth-First Search</h4></a></li>
+                    <li><a href=""><h4>Breadth-First Search</h4></a></li>
+                    <li><a href=""><h4>Dijkstra's Algorithm</h4></a></li>
+                    <li><a href=""><h4>A* Algorithm</h4></a></li>
+                    <li><a href=""><h4>Prim's Algorithm</h4></a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-compare">
+                <a href=""><h3>COMPARE ALGORITHMS</h3></a>
+            </div>
+        </div>
+
         <div class="hero">
             <h1>ALGORITHM VISUALIZER</h1>
             <h4>Interactive step-by-step visualizers, Big-O complexity breakdowns, and clean code implementations to master core algorithms and compare their real-world efficiency.</h4>

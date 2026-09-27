@@ -1,3 +1,5 @@
+// -------------------------------- Carousel Functionality --------------------------------
+
 const carousel = document.querySelector('#carousel-viewport');
 const dots = document.querySelectorAll('.indicators li');
 const slideCount = dots.length;
@@ -76,3 +78,19 @@ dots.forEach((dot, index) => {
 
 carousel.scrollLeft = carousel.clientWidth;
 scheduleAutoScroll();
+
+
+
+// -------------------------------- Sidebar Functionality --------------------------------
+
+const hamburger = document.querySelector('.hamburger-btn');
+const sidebar = document.querySelector('.sidebar');
+const closeBtn = document.querySelector('.close-btn');
+
+closeBtn.addEventListener('click', () => {
+    sidebar.classList.remove('is-open');
+});
+
+hamburger.addEventListener('click', () => {
+    sidebar.classList.add('is-open');
+});
