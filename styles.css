@@ -184,7 +184,7 @@ h4 {
 }
 
 .carousel {
-    max-width: calc(100% - 3rem);
+    max-width: calc(100% - 2rem);
     margin: 0 auto;
 
     display: flex;
@@ -269,7 +269,7 @@ li {
 .features {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
 }
 
 .feature-cards {
