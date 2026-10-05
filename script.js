@@ -1,96 +1,111 @@
-// -------------------------------- Carousel Functionality --------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+    // -------------------------------- Sidebar Controller --------------------------------
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    const closeBtn = document.querySelector('.close-btn');
+    const sidebar = document.querySelector('.sidebar');
 
-const carousel = document.querySelector('#carousel-viewport');
-const dots = document.querySelectorAll('.indicators li');
-const slideCount = dots.length;
-const autoScrollDelay = 4000;
-let autoScrollTimer;
-let boundaryTimer;
-let isRepositioning = false;
-
-function setActiveDot(index) {
-    dots.forEach((dot, dotIndex) => {
-        dot.classList.toggle('active', dotIndex === index);
-    });
-}
-
-function updateCarousel() {
-    const slideWidth = carousel.clientWidth;
-    const physicalIndex = Math.round(carousel.scrollLeft / slideWidth);
-    clearTimeout(boundaryTimer);
-
-    if (physicalIndex === 0) {
-        setActiveDot(slideCount - 1);
-        boundaryTimer = setTimeout(() => {
-            if (Math.round(carousel.scrollLeft / carousel.clientWidth) !== 0) return;
-
-            isRepositioning = true;
-            carousel.scrollLeft = slideCount * carousel.clientWidth;
-            requestAnimationFrame(() => {
-                isRepositioning = false;
-            });
-        }, 140);
-        return;
+    function toggleSidebar(open) {
+        if (!sidebar || !hamburgerBtn) return;
+        sidebar.classList.toggle('is-open', open);
+        sidebar.setAttribute('aria-hidden', (!open).toString());
+        hamburgerBtn.setAttribute('aria-expanded', open.toString());
+        document.body.style.overflow = open ? 'hidden' : '';
     }
 
-    if (physicalIndex === slideCount + 1) {
-        setActiveDot(0);
-        boundaryTimer = setTimeout(() => {
-            if (Math.round(carousel.scrollLeft / carousel.clientWidth) !== slideCount + 1) return;
-
-            isRepositioning = true;
-            carousel.scrollLeft = carousel.clientWidth;
-            requestAnimationFrame(() => {
-                isRepositioning = false;
-            });
-        }, 140);
-        return;
+    if (hamburgerBtn && sidebar) {
+        hamburgerBtn.addEventListener('click', () => toggleSidebar(true));
     }
 
-    setActiveDot(physicalIndex - 1);
-}
+    if (closeBtn && sidebar) {
+        closeBtn.addEventListener('click', () => toggleSidebar(false));
+    }
 
-function scheduleAutoScroll() {
-    clearTimeout(autoScrollTimer);
-    autoScrollTimer = setTimeout(() => {
-        const currentIndex = Math.round(carousel.scrollLeft / carousel.clientWidth);
+    // -------------------------------- Carousel Controller --------------------------------
+    const carousel = document.querySelector('#carousel-viewport');
+    const dots = document.querySelectorAll('.indicators li');
+    const slides = document.querySelectorAll('.carousel-image');
+
+    if (!carousel || slides.length === 0 || dots.length === 0) return;
+
+    const slideCount = Math.min(slides.length, dots.length);
+    const autoScrollDelay = 4000;
+    let autoScrollTimer = null;
+    let isUserInteracting = false;
+    let rAFPending = false;
+
+    function setActiveDot(index) {
+        dots.forEach((dot, dotIndex) => {
+            dot.classList.toggle('active', dotIndex === index);
+        });
+    }
+
+    function syncIndex() {
+        const slideWidth = carousel.clientWidth;
+        if (!slideWidth) return;
+
+        const currentIndex = Math.min(
+            Math.max(0, Math.round(carousel.scrollLeft / slideWidth)),
+            slideCount - 1
+        );
+        setActiveDot(currentIndex);
+    }
+
+    function scrollToIndex(index) {
+        const slideWidth = carousel.clientWidth;
         carousel.scrollTo({
-            left: (currentIndex + 1) * carousel.clientWidth,
+            left: index * slideWidth,
             behavior: 'smooth'
         });
-    }, autoScrollDelay);
-}
+        setActiveDot(index);
+    }
 
-carousel.addEventListener('scroll', () => {
-    if (!isRepositioning) updateCarousel();
-    scheduleAutoScroll();
-});
+    function scheduleAutoScroll() {
+        clearTimeout(autoScrollTimer);
+        if (isUserInteracting) return;
 
-dots.forEach((dot, index) => {
-    dot.addEventListener('click', () => {
-        carousel.scrollTo({
-            left: (index + 1) * carousel.clientWidth,
-            behavior: 'smooth'
-        });
+        autoScrollTimer = setTimeout(() => {
+            const slideWidth = carousel.clientWidth;
+            const currentIndex = Math.round(carousel.scrollLeft / slideWidth);
+            const nextIndex = (currentIndex + 1) % slideCount;
+            scrollToIndex(nextIndex);
+            scheduleAutoScroll();
+        }, autoScrollDelay);
+    }
+
+    // Smooth scroll event debouncing with requestAnimationFrame
+    carousel.addEventListener('scroll', () => {
+        if (!rAFPending) {
+            rAFPending = true;
+            requestAnimationFrame(() => {
+                syncIndex();
+                rAFPending = false;
+            });
+        }
         scheduleAutoScroll();
+    }, { passive: true });
+
+    // Pause on finger touches / drag to prevent competing scrolls
+    carousel.addEventListener('touchstart', () => {
+        isUserInteracting = true;
+        clearTimeout(autoScrollTimer);
+    }, { passive: true });
+
+    carousel.addEventListener('touchend', () => {
+        isUserInteracting = false;
+        scheduleAutoScroll();
+    }, { passive: true });
+
+    // Interactive pagination dots
+    dots.forEach((dot, index) => {
+        if (index < slideCount) {
+            dot.addEventListener('click', () => {
+                scrollToIndex(index);
+                scheduleAutoScroll();
+            });
+        }
     });
-});
 
-carousel.scrollLeft = carousel.clientWidth;
-scheduleAutoScroll();
-
-
-
-// -------------------------------- Sidebar Functionality --------------------------------
-
-const hamburger = document.querySelector('.hamburger-btn');
-const sidebar = document.querySelector('.sidebar');
-const closeBtn = document.querySelector('.close-btn');
-
-closeBtn.addEventListener('click', () => {
-    sidebar.classList.remove('is-open');
-});
-
-hamburger.addEventListener('click', () => {
-    sidebar.classList.add('is-open');
+    // Initialize
+    syncIndex();
+    scheduleAutoScroll();
 });
